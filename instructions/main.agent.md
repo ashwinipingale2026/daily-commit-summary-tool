@@ -13,3 +13,5 @@ Each entry below is an instruction file with a one-line description. Optional su
   + Keywords: status report, weekly report, standup, accomplishments, blockers
 - [`./instructions/finalize-status-report.agent.md`](./finalize-status-report.agent.md) — Validate a draft weekly status report against constraints and save it to `reports/<YYYY-MM-DD>-weekly-status.md`.
   + Keywords: finalize status report, save report, publish report, weekly report file
+- [`./instructions/calculate-compound-interest.agent.md`](./calculate-compound-interest.agent.md) — Invoke `tools/compound_interest.py` to calculate compound interest and present the results.
+  + Keywords: compound interest, final amount, interest earned, principal, annual rate, compounding
