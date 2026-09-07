@@ -15,3 +15,5 @@ Each entry below is an instruction file with a one-line description. Optional su
   + Keywords: finalize status report, save report, publish report, weekly report file
 - [`./instructions/calculate-compound-interest.agent.md`](./calculate-compound-interest.agent.md) — Invoke `tools/compound_interest.py` to calculate compound interest and present the results.
   + Keywords: compound interest, final amount, interest earned, principal, annual rate, compounding
+- [`./instructions/summarize-commits-by-date.agent.md`](./summarize-commits-by-date.agent.md) — Invoke `tools/summarize_commits.py` to summarize git commits made on a specific date.
+  + Keywords: summarize commits, commit summary, commits on date, daily commits
