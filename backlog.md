@@ -11,16 +11,16 @@ Source: [project_spec.md](project_spec.md)
 - [x] Git log collection via `subprocess` (argument lists, no shell interpolation) — `commit_collector.py`
 - [x] `Commit` dataclass (hash, author, timestamp, subject/body, files, +/- lines) — `commit_collector.py`
 - [x] `.gitignore` includes `.env`
-- [ ] Decide and document defaults for open spec items (Section 13), to revisit later if wrong:
+- [ ] Decide and document defaults for open spec items (Section 13), to revisit later if wrong: (GitHub issue #1)
   - [ ] GitHub Models API endpoint + model name + auth header format
   - [ ] Env var name: `GITHUB_TOKEN`
   - [ ] `reports/` output — gitignored (not committed)
   - [ ] Diff size limit for LLM prompt truncation (e.g. 4000 chars per author)
-- [ ] Create `config.py` with tunable constants (time window hours, activity thresholds, output dir, diff size limit) sourced from existing hardcoded values in `activity_score.py`
-- [ ] Add `requirements.txt` (`python-dotenv`, `requests`)
-- [ ] Add `.env.example` documenting `GITHUB_TOKEN` (placeholder value only)
-- [ ] Verify `.env` is populated locally and never committed (`git status` check)
-- [ ] Install dependencies (`pip install -r requirements.txt`) in project venv
+- [ ] Create `config.py` with tunable constants (time window hours, activity thresholds, output dir, diff size limit) sourced from existing hardcoded values in `activity_score.py` (GitHub issue #2)
+- [ ] Add `requirements.txt` (`python-dotenv`, `requests`) (GitHub issue #3)
+- [ ] Add `.env.example` documenting `GITHUB_TOKEN` (placeholder value only) (GitHub issue #4)
+- [ ] Verify `.env` is populated locally and never committed (`git status` check) (GitHub issue #5)
+- [ ] Install dependencies (`pip install -r requirements.txt`) in project venv (GitHub issue #6)
 
 ## Phase 2: Core Features
 
