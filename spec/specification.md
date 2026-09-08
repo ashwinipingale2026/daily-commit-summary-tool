@@ -1,7 +1,7 @@
 # Daily Commit Summary Tool - Feature Specification
 
 **Status:** Draft
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Date:** 2026-09-09
 **Constitution:** [`spec/constitution.md`](./constitution.md)
 
@@ -13,7 +13,7 @@ A project manager overseeing a six-person time-and-materials team needs a fast, 
 
 ### 1.2 Product
 
-The Daily Commit Summary Tool collects commits from one local Git repository and its current/default branch for a rolling 24-hour window. It presents a Markdown-compatible report grouped by author, including source commits, changed files, line statistics, a transparent Low/Medium/High activity indicator, and an optional AI-generated plain-English summary.
+The Daily Commit Summary Tool collects commits from one local Git repository and its checked-out `HEAD` for a rolling 24-hour window. It presents a Markdown-compatible report grouped by author, including source commits, changed files, line statistics, a transparent Low/Medium/High activity indicator, and an optional AI-generated plain-English summary.
 
 The React frontend provides the project manager's report view. The Node.js/Express backend performs Git collection, scoring, AI integration, persistence, and report retrieval. PostgreSQL stores auditable report data.
 
@@ -32,6 +32,21 @@ The React frontend provides the project manager's report view. The Node.js/Expre
 - Automatic scheduling, email, Slack, or other delivery integrations.
 - Author roster management or identity normalization beyond Git's recorded name/email.
 - Editing commits or writing back to the source repository.
+
+### 1.5 MVP decisions and boundaries
+
+- The React/Express web application is the MVP product. The earlier Python CLI is legacy and out of scope for MVP.
+- The backend reads one server-configured local repository from `REPOSITORY_PATH`; the browser cannot select a repository.
+- Collection uses the checked-out `HEAD`. Detached `HEAD` is rejected. Default-branch discovery is out of scope for MVP.
+- The rolling window is the previous 24 hours using committer timestamps. Timestamps are stored and displayed in UTC.
+- Each request creates a new completed report. The latest report is selected by `generated_at DESC`; report deduplication and version reuse are out of scope for MVP.
+- PostgreSQL is the source of truth. Markdown is a deterministic projection written after the database transaction; a Markdown write failure leaves the API report available and records a warning.
+- AI summaries are optional. Without `GITHUB_TOKEN`, or when the configured provider fails, deterministic fallback text is used and report generation continues.
+- The MVP is a trusted local deployment bound to localhost. Authentication, public deployment, multi-user authorization, and production retention/backup are out of scope.
+
+### 1.6 MVP out of scope
+
+Python CLI support, multiple repositories, remote/default-branch discovery, configurable timezones, advanced rename/copy/submodule/merge-diff semantics, report deduplication, distributed locking, job queues, server-side pagination, mobile optimization, full browser E2E coverage, provider-specific AI optimization, and production orchestration are deferred beyond MVP.
 
 ## 2. Users and User Scenarios
 
@@ -144,9 +159,9 @@ Scenario: Missing AI token
 ### 3.1 Repository collection
 
 - **FR-001:** The backend MUST operate on the configured single local repository.
-- **FR-002:** Collection MUST use the current/default branch (`HEAD`) and MUST NOT scan remote or unrelated local branches.
-- **FR-003:** The default window MUST be the preceding 24 hours from request time, using commit timestamps and local timezone presentation.
-- **FR-004:** Each collected commit MUST include short hash, author name, author email, author timestamp, full message, changed-file list/count, additions, and deletions.
+- **FR-002:** Collection MUST use the checked-out `HEAD`; detached `HEAD` MUST return a clear configuration error.
+- **FR-003:** The default window MUST be the preceding 24 hours from request time, filtered by committer timestamp. UTC MUST be used for storage and display.
+- **FR-004:** Each collected commit MUST include short hash, full hash, author name, author email, author timestamp, committer timestamp, full message, changed-file list/count, additions, and deletions.
 - **FR-005:** Git processes MUST receive argument arrays and MUST expose clear errors when Git is unavailable or returns an unexpected failure.
 - **FR-006:** A no-commit result MUST not create a report record or output file.
 
@@ -156,6 +171,7 @@ Scenario: Missing AI token
 - **FR-008:** Author totals MUST include commit count, unique files touched, total additions, total deletions, and calculated score.
 - **FR-009:** Authors MUST be ordered by score descending, then name alphabetically.
 - **FR-010:** Commits within an author section MUST be ordered newest first.
+- **FR-010a:** Authors MUST be ordered by score descending, name ascending, then email ascending. Scores MUST display rounded to two decimal places.
 
 ### 3.3 Scoring
 
@@ -163,6 +179,7 @@ Scenario: Missing AI token
 - **FR-012:** Default thresholds MUST be Low `< 10`, Medium `>= 10 and < 30`, and High `>= 30`.
 - **FR-013:** Window size, score weights, and thresholds MUST be configuration values, not constants buried in collection or presentation logic.
 - **FR-014:** The API and report MUST expose raw metrics so the score can be independently checked.
+- **FR-014a:** Each persisted report MUST store a scoring formula version, weights, and thresholds so historical reports are never recalculated under later configuration.
 
 ### 3.4 AI summaries
 
@@ -170,7 +187,9 @@ Scenario: Missing AI token
 - **FR-016:** Per-author input MUST include concatenated commit messages and either bounded diffs or file-level statistics when the configured diff limit is exceeded.
 - **FR-017:** The prompt MUST request a 2-4 sentence plain-English project-manager summary and prohibit unsupported details.
 - **FR-018:** An AI failure MUST be isolated to the affected author and MUST NOT prevent report persistence.
-- **FR-019:** Tokens MUST be loaded from environment configuration (`GITHUB_TOKEN` or the finalized project variable) and MUST never appear in logs, API responses, or reports.
+- **FR-019:** `GITHUB_TOKEN` is optional and MUST be loaded from environment configuration. It MUST never appear in logs, API responses, or reports.
+- **FR-019a:** When AI is enabled, `GITHUB_MODELS_ENDPOINT` and `GITHUB_MODELS_MODEL` MUST be configured. Requests have a 15-second timeout and one retry for transient 429/5xx responses.
+- **FR-019b:** AI input MUST treat commit content as untrusted data, provide no tools, and accept only non-empty plain text containing 1-4 sentences. Invalid output uses fallback text.
 
 ### 3.5 Reports and persistence
 
@@ -178,14 +197,16 @@ Scenario: Missing AI token
 - **FR-021:** Markdown output MUST use `reports/commit_summary_<YYYY-MM-DD>.md`, creating `reports/` when needed.
 - **FR-022:** PostgreSQL records MUST retain report metadata, author aggregates, summaries, and source commit details sufficient for audit or reproduction.
 - **FR-023:** Generated Markdown and API data MUST escape or safely render commit-derived text.
-- **FR-024:** Report generation MUST be idempotent for the same repository, branch, and reporting window, or MUST define a documented duplicate policy before implementation.
+- **FR-024:** Each request creates a new report. The latest report is selected by `generated_at DESC`; deduplication is out of scope for MVP.
 
 ### 3.6 API and frontend
 
-- **FR-025:** The Express API MUST expose an endpoint to generate a report and an endpoint to retrieve the latest report; exact route names are finalized in the implementation plan.
+- **FR-025:** The Express API MUST expose `POST /api/reports/generate`, `GET /api/reports/latest`, `GET /api/reports/:id/markdown`, and `GET /health`.
 - **FR-026:** API responses MUST distinguish `success`, `no_data`, `partial_success`, and `error` outcomes using stable typed shapes.
 - **FR-027:** The frontend MUST provide a manual generate action, latest-report view, loading state, empty state, partial-AI-warning state, and actionable error state.
 - **FR-028:** The UI MUST display report metadata, author ordering, activity labels, raw metrics, AI/fallback summary, and source commit details.
+- **FR-029:** Generation requests MUST have no browser-supplied repository path or configuration body. Only one generation may run per backend process; concurrent requests return HTTP 409.
+- **FR-030:** Error responses MUST use `{ status, code, message, retryable, requestId }`. HTTP statuses MUST be 400 for validation, 404 for no report, 409 for concurrent generation, 422 for invalid Git state, 503 for dependency failure, and 500 for unexpected failure.
 
 ## 4. Data Model Requirements
 
@@ -215,6 +236,7 @@ report 1 ---- * report_warning
 | `head_commit_hash` | `text` | Full hash used as the collection snapshot |
 | `window_start` | `timestamptz` | Inclusive start of the reporting window |
 | `window_end` | `timestamptz` | Exclusive end/request timestamp |
+| `scoring_config` | `jsonb` | Formula version, weights, and thresholds used for this report |
 | `generated_at` | `timestamptz` | Report completion timestamp |
 | `total_commits` | `integer` | Must be greater than zero |
 | `contributing_authors` | `integer` | Must be greater than zero |
@@ -225,8 +247,9 @@ report 1 ---- * report_warning
 - `window_start` MUST be earlier than `window_end`.
 - `total_commits` MUST equal the count of child `commit_evidence` rows.
 - `contributing_authors` MUST equal the count of child `author_summary` rows.
-- The implementation MUST choose and document an idempotency key, recommended as `(repository_path, branch_name, head_commit_hash, window_start, window_end)`.
-- `repository_path` MUST be normalized consistently before uniqueness checks.
+- Failed and in-progress generation attempts are log-only and MUST NOT create report rows in MVP.
+- Each request creates a new report in MVP; no report uniqueness key is required.
+- `repository_path` MUST be validated at startup and MUST NOT be supplied by the browser.
 
 ### 4.3 `author_summaries`
 
@@ -244,11 +267,12 @@ report 1 ---- * report_warning
 | `activity_level` | `text` | `low`, `medium`, or `high`; constrained enum/check |
 | `summary_text` | `text` | AI-generated or deterministic fallback text |
 | `summary_source` | `text` | `ai` or `fallback`; constrained enum/check |
-| `summary_status` | `text` | `available`, `unavailable`, or `not_requested` |
+| `summary_status` | `text` | `available` for AI or fallback text |
 | `summary_warning` | `text` | Safe, non-secret warning detail; nullable |
 | `created_at` | `timestamptz` | Row creation timestamp |
 
-- Uniqueness MUST be enforced on `(report_id, author_name, author_email)`.
+- Uniqueness MUST be enforced on `(report_id, author_name, author_email)`, preserving exact case and storing empty email as an empty string.
+- AI success MUST use `summary_source=ai,status=available`; disabled or failed AI MUST use `summary_source=fallback,status=available` with a warning when applicable.
 - `activity_score` MUST be calculated by the service and independently testable; it MUST NOT be accepted as an unvalidated client value.
 - Email values MUST be validated as Git metadata but MUST NOT be used to infer identity beyond the report.
 
@@ -258,21 +282,25 @@ report 1 ---- * report_warning
 |---|---|---|
 | `id` | `uuid` | Primary key |
 | `author_summary_id` | `uuid` | Required foreign key to `author_summaries(id)` |
+| `report_id` | `uuid` | Required foreign key to `reports(id)` for report-scoped uniqueness |
 | `commit_hash` | `text` | Full Git hash; unique within the report |
 | `short_hash` | `text` | Display hash derived from the full hash |
 | `author_name` | `text` | Snapshot of Git metadata |
 | `author_email` | `text` | Snapshot of Git metadata |
 | `author_timestamp` | `timestamptz` | Commit author date |
+| `committer_timestamp` | `timestamptz` | Timestamp used for window filtering |
 | `subject` | `text` | Commit subject |
 | `body` | `text` | Commit body; nullable |
 | `files_changed` | `jsonb` | Array of path/stat objects |
+| `binary` | `boolean` | True when Git does not provide line counts |
 | `file_count` | `integer` | Number of changed files |
 | `lines_added` | `integer` | Zero or greater |
 | `lines_removed` | `integer` | Zero or greater |
 | `created_at` | `timestamptz` | Row creation timestamp |
 
-- `commit_hash` MUST be unique within a report.
+- `UNIQUE(report_id, commit_hash)` MUST be enforced.
 - `files_changed` MUST preserve changed paths and per-file additions/deletions where Git provides them.
+- Binary or unavailable line counts MUST be stored as zero with `binary=true`. A rename counts as one touched file using the new path. Detailed copy detection, submodule semantics, mode-only changes, and combined merge diffs are out of scope for MVP.
 - Repository-derived text MUST be stored as data and safely escaped at rendering boundaries.
 - The system MUST reject malformed or incomplete evidence rather than persisting unverifiable aggregates.
 
@@ -296,7 +324,7 @@ report 1 ---- * report_warning
 - API retrieval MUST return one report with its nested author summaries, evidence, and warnings without N+1 database queries.
 - A report MUST be written transactionally: create the report, child summaries, evidence, and warnings together; rollback when collection or persistence fails.
 - No-data requests MUST not create a `reports` row.
-- Retention and archival policy MUST be documented before production deployment.
+- Retention and archival policy is out of scope for MVP and MUST be defined before production deployment.
 
 ### 4.7 API projection
 
@@ -328,6 +356,22 @@ The persistence model MUST be mapped to a stable API model rather than exposed d
 ```
 
 The `no_data`, `partial_success`, and `error` response shapes MUST be documented alongside this success shape.
+
+### 4.8 MVP configuration
+
+| Variable | Required | MVP behavior |
+|---|---|---|
+| `REPOSITORY_PATH` | Yes | Single local repository; validated at startup |
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `GITHUB_TOKEN` | No | Enables AI summaries when present |
+| `GITHUB_MODELS_ENDPOINT` | With AI | Provider endpoint |
+| `GITHUB_MODELS_MODEL` | With AI | Provider model |
+| `PORT` | No | Backend port with documented local default |
+| `FRONTEND_ORIGIN` | No | Local frontend origin allowed by CORS |
+| `REPORT_TIMEZONE` | No | Fixed to `UTC` for MVP |
+| `DIFF_SIZE_LIMIT` | No | Maximum AI input size before stat-only mode |
+
+The repository path and all secrets are server-side configuration. The browser MUST NOT submit them.
 
 ## 5. UI Screen Requirements
 
@@ -364,7 +408,7 @@ The first release requires one primary screen. A separate settings screen is out
 
 - Display repository, branch, window start/end, generation time, total commits, and contributing authors.
 - Display a compact totals row for total files touched, lines added, and lines removed when those totals are available.
-- Provide a clear link or control to the generated Markdown report path when the backend returns one.
+- Provide a download control that calls `GET /api/reports/:id/markdown`; the UI MUST NOT expose a server filesystem path.
 
 **Author summary list**
 
@@ -390,6 +434,7 @@ When a report is being generated:
 - Disable generation controls.
 - Do not replace an existing successful report until the new request succeeds.
 - If generation completes with warnings, transition to the partial-success state rather than a generic success state.
+- Initial screen load MUST call `GET /api/reports/latest`. Generation is not cancellable in MVP; refresh may occur while it runs and the previous report remains visible.
 
 ### 5.4 Empty/no-data state
 
@@ -427,6 +472,7 @@ For invalid repository, unavailable Git, database failure, or other non-success 
 - Expand/collapse controls MUST expose their state and relationship to the controlled content.
 - Tables or lists MUST have usable headings/labels, and timestamps MUST have machine-readable full values with human-readable display text.
 - Text, controls, and warnings MUST meet the project accessibility contrast standard.
+- The MVP targets WCAG 2.1 AA on desktop and tablet browsers. Mobile optimization and reduced-motion polish are out of scope for MVP.
 
 ### 5.8 UI acceptance scenarios
 
@@ -465,6 +511,9 @@ Scenario: Recover from an API error
 | Database unavailable | Clear server error; do not claim report persistence |
 | Unsafe path or request input | Reject at the boundary and log a safe diagnostic |
 | Oversized diff | Use file names and diff statistics instead of full diff |
+| Detached `HEAD` | Clear configuration error; no report |
+| Concurrent generation | HTTP 409; the active generation continues |
+| Markdown write failure | Keep the persisted API report available and record a safe warning |
 
 ## 7. Non-Functional Requirements
 
@@ -477,18 +526,21 @@ Scenario: Recover from an API error
 - **NFR-007 Usability:** A user MUST be able to request and understand a report without command-line interaction.
 - **NFR-008 Performance:** The UI MUST show request progress, and the backend MUST enforce a configurable diff/prompt size limit.
 - **NFR-009 Observability:** Backend logs MUST identify request, collection, AI, and persistence failures without secrets.
+- **NFR-010 Local security:** The backend MUST bind to localhost for MVP; CORS MUST allow only `FRONTEND_ORIGIN`, and authentication is out of scope.
+- **NFR-011 Health:** `GET /health` MUST return process health without exposing credentials or repository contents.
 
 ## 8. Scope Boundaries
 
 ### In scope
 
-- One local repository and current/default branch.
+- One local repository and the checked-out `HEAD`.
 - Manual on-demand generation.
 - Rolling 24-hour collection.
 - React report UI and Express API.
 - PostgreSQL persistence.
 - Markdown report generation.
 - GitHub Models summaries with bounded input and deterministic fallback.
+- Localhost React/Express/PostgreSQL deployment with one in-process generation at a time.
 
 ### Out of scope
 
@@ -497,14 +549,16 @@ Scenario: Recover from an API error
 - Scheduled jobs, notifications, exports other than Markdown.
 - User authentication and multi-tenant access control unless added by a future specification.
 - Billing, time tracking, effort estimation, or performance ranking.
+- Python CLI support and CLI/web output parity.
+- Configurable timezone display, advanced Git edge-case interpretation, report deduplication, distributed locks, job queues, server-side pagination, mobile optimization, and production retention/backup automation.
 
 ## 9. Assumptions and Decisions Needed
 
-- The configured repository path is available to the backend process and points to the one intended local repository.
+- `REPOSITORY_PATH` is available to the backend process and points to the one intended local repository.
 - Git author identity is used as recorded; no roster mapping is required.
-- The exact GitHub Models endpoint, model, and finalized environment variable name MUST be confirmed in the implementation plan.
-- The report duplicate/idempotency policy MUST be confirmed before database migrations are finalized.
-- The version-control policy for generated `reports/` output MUST be confirmed before release.
+- The exact GitHub Models endpoint and model are supplied through `GITHUB_MODELS_ENDPOINT` and `GITHUB_MODELS_MODEL` when AI is enabled.
+- Each generation creates a new report; latest selection uses `generated_at DESC`.
+- PostgreSQL is authoritative; Markdown is a downloadable projection and may produce a warning if writing fails.
 
 ## 10. Acceptance Checklist
 
@@ -518,11 +572,8 @@ Scenario: Recover from an API error
 - [ ] Frontend loading, empty, warning, success, and error states are covered.
 - [ ] PostgreSQL 15 starts through Docker Compose and schema migrations are repeatable.
 - [ ] Targeted tests cover collection, scoring, report formatting, API contracts, persistence, and fallback behavior.
+- [ ] Detached `HEAD`, concurrent generation, Markdown-write failure, binary files, and oversized input have defined behavior.
 
-## 11. Open Questions
+## 11. Deferred Decisions
 
-1. What exact GitHub Models endpoint and model should be used?
-2. Should generated Markdown reports be committed or ignored?
-3. What maximum diff/prompt size should trigger stat-only AI input?
-4. Should repeated requests for the same window reuse an existing report or create a new generation record?
-5. Is authentication required before the first production deployment?
+The following are intentionally deferred beyond MVP: production GitHub Models endpoint/model selection, report-file version-control policy, configurable timezones, report deduplication/versioning, authentication, retention and backup policy, distributed concurrency control, advanced Git diff semantics, mobile optimization, and full browser E2E coverage.
