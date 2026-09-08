@@ -16,7 +16,7 @@ Source: [project_spec.md](project_spec.md)
   - [ ] Env var name: `GITHUB_TOKEN`
   - [ ] `reports/` output — gitignored (not committed)
   - [ ] Diff size limit for LLM prompt truncation (e.g. 4000 chars per author)
-- [ ] Create `config.py` with tunable constants (time window hours, activity thresholds, output dir, diff size limit) sourced from existing hardcoded values in `activity_score.py` (GitHub issue #2)
+- [ ] Create `config.py` with tunable constants (time window hours, activity thresholds, output dir, diff size limit) sourced from existing hardcoded values in `activity_score.py` (GitHub issue #2; delegated to GitHub coding agent)
 - [ ] Add `requirements.txt` (`python-dotenv`, `requests`) (GitHub issue #3)
 - [ ] Add `.env.example` documenting `GITHUB_TOKEN` (placeholder value only) (GitHub issue #4)
 - [ ] Verify `.env` is populated locally and never committed (`git status` check) (GitHub issue #5)
