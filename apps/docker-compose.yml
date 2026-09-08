@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-daily_commit_summary}
+      POSTGRES_USER: ${POSTGRES_USER:-daily_summary_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env before starting PostgreSQL}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - daily-commit-summary-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  daily-commit-summary-postgres:
