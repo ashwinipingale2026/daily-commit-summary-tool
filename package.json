@@ -1,0 +1,8 @@
+{
+  "name": "daily-commit-summary-tool",
+  "private": true,
+  "workspaces": [
+    "apps/frontend",
+    "apps/backend"
+  ]
+}
