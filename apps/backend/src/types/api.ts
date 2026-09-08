@@ -79,6 +79,12 @@ export type ApiResponse = SuccessResponse | NoDataResponse | ApiError;
 
 export interface ReportRepositoryPort {
   findLatestReport(repositoryPath: string, branchName?: string): Promise<PersistedReport | null>;
+  findReportById(reportId: string): Promise<PersistedReport | null>;
+}
+
+export interface ReportPersistencePort extends ReportRepositoryPort {
+  saveReport(report: import("./report").ReportRecord): Promise<PersistedReport>;
+  appendWarning?(reportId: string, warning: import("./report").ReportWarningRecord): Promise<void>;
 }
 
 export interface ReportProjectionPort {

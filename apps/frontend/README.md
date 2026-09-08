@@ -11,6 +11,9 @@ npm run dev
 
 The application is available at `http://localhost:5173/daily-summary`.
 
+Set `VITE_BACKEND_ORIGIN` when the backend is not running at its default local
+origin of `http://localhost:3000`.
+
 ## Validation
 
 ```text

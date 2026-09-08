@@ -266,7 +266,7 @@ export class ReportRepository {
     }
   }
 
-  async findLatestReport(repositoryPath: string, branchName?: string): Promise<PersistedReport | null> {
+  private async findOneReport(whereClause: string, values: unknown[]): Promise<PersistedReport | null> {
     const result = await this.pool.query<ReportRow>(
       `SELECT
         r.*,
@@ -329,12 +329,31 @@ export class ReportRepository {
         FROM report_warnings w
         WHERE w.report_id = r.id
       ) warning_data ON true
-      WHERE r.repository_path = $1 AND ($2::text IS NULL OR r.branch_name = $2)
+      WHERE ${whereClause}
       ORDER BY r.generated_at DESC, r.id DESC
       LIMIT 1`,
-      [repositoryPath, branchName ?? null],
+      values,
     );
 
     return result.rows[0] ? mapReportRow(result.rows[0]) : null;
+  }
+
+  async findLatestReport(repositoryPath: string, branchName?: string): Promise<PersistedReport | null> {
+    return this.findOneReport("r.repository_path = $1 AND ($2::text IS NULL OR r.branch_name = $2)", [
+      repositoryPath,
+      branchName ?? null,
+    ]);
+  }
+
+  async findReportById(reportId: string): Promise<PersistedReport | null> {
+    return this.findOneReport("r.id = $1", [reportId]);
+  }
+
+  async appendWarning(reportId: string, warning: { code: string; message: string }): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO report_warnings (report_id, code, message)
+       VALUES ($1, $2, $3)`,
+      [reportId, warning.code, warning.message],
+    );
   }
 }

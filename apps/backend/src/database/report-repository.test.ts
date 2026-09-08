@@ -203,3 +203,31 @@ test("returns null when no latest report exists", async () => {
 
   assert.equal(await repository.findLatestReport("C:\\repositories\\daily-summary", "main"), null);
 });
+
+test("supports report-by-id lookup and keeps repository/branch filters parameterized", async () => {
+  const pool = new FakePool();
+  pool.latestRows = [{
+    id: "report-id",
+    repository_path: "C:\\repositories\\daily-summary",
+    repository_name: "daily-summary",
+    branch_name: "main",
+    head_commit_hash: "abcdef123456",
+    window_start: new Date("2025-01-01T00:00:00.000Z"),
+    window_end: new Date("2025-01-02T00:00:00.000Z"),
+    scoring_config: { formulaVersion: "1" },
+    generated_at: new Date("2025-01-02T00:00:01.000Z"),
+    total_commits: 1,
+    contributing_authors: 1,
+    output_path: null,
+    generation_status: "completed",
+    authors: [],
+    warnings: [],
+  }];
+  const repository = new ReportRepository(pool as unknown as Pool);
+
+  const report = await repository.findReportById("report-id");
+
+  assert.equal(report?.id, "report-id");
+  assert.match(pool.calls[0]?.text ?? "", /WHERE r\.id = \$1/);
+  assert.deepEqual(pool.calls[0]?.values, ["report-id"]);
+});

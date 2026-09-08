@@ -24,9 +24,15 @@ export function createReportsRouter(options: ReportRouteOptions): Router {
         throw new HttpError(503, "REPORT_GENERATION_UNAVAILABLE", "Report generation is not available", true);
       }
       const result = await options.generation.generate();
-      response.status(result.status === "error" ? 500 : 200).json(
-        result.status === "error" ? { ...result, requestId: request.requestId } : result,
-      );
+      if (result.status === "error") {
+        response.status(500).json({ ...result, requestId: request.requestId });
+        return;
+      }
+      if (result.status === "no_data") {
+        response.status(200).json({ ...result, requestId: request.requestId });
+        return;
+      }
+      response.status(200).json(result);
     } catch (error) {
       next(error);
     }
