@@ -6,6 +6,7 @@ A simple Python calculator project with basic addition, subtraction, and multipl
 
 - `calculator.py`: Defines `add()`, `subtract()`, and `multiply()` functions.
 - `main.py`: Demonstrates how to use the calculator functions.
+- `calculator/`: Contains the package-style calculator example and operations module.
 
 ## Run
 
