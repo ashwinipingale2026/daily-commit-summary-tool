@@ -1,0 +1,37 @@
+PROJECT STATUS MEETING NOTES
+
+Meeting Date: 14 April 2026
+Project: Digital Transformation Program
+Overall Status: Green
+
+Attendees:
+- Daniel Scott
+- Chloe Martin
+- Henry Walker
+- Zoe Adams
+- Jack Foster
+
+Key Discussions:
+- Reviewed progress against sprint goals and discussed impact of data quality risk.
+- Analyzed issue: Inconsistent dashboard metrics and agreed remediation approach.
+- Checked readiness of dependency Compliance review and escalation path if delayed.
+- Reviewed milestone forecast, budget consumption, and delivery confidence.
+- Captured stakeholder feedback and agreed next-step priorities.
+
+Risks:
+- Data quality risk: Source system contains incomplete historical records.
+
+Issues:
+- Inconsistent dashboard metrics
+
+Dependencies:
+- Compliance review
+
+Action Items:
+| Action Item | Owner | Due Date |
+|---|---|---|
+| Mitigate risk: Data quality risk | Project Lead | 18 Apr 2026 |
+| Resolve issue: Inconsistent dashboard metrics | Engineering Lead | 19 Apr 2026 |
+| Follow up on dependency: Compliance review | Delivery Manager | 17 Apr 2026 |
+| Publish updated project status report | PMO Analyst | 16 Apr 2026 |
+| Confirm next sprint objectives with stakeholders | Business Lead | 20 Apr 2026 |

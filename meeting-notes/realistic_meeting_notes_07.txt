@@ -1,0 +1,28 @@
+PROJECT STATUS MEETING NOTES
+
+Meeting Date: 17 February 2026
+Project: Digital Transformation Program
+Overall Status: Amber
+
+Attendees:
+- Emma Carter
+- Liam Brooks
+- Sofia Patel
+- Noah Reed
+- Olivia Chen
+
+Key Discussions:
+- Reviewed progress against sprint goals and discussed impact of resource constraint.
+- Analyzed issue: Critical defects discovered during UAT and agreed remediation approach.
+- Checked readiness of dependency Infrastructure setup and escalation path if delayed.
+- Reviewed milestone forecast, budget consumption, and delivery confidence.
+- Captured stakeholder feedback and agreed next-step priorities.
+
+Risks:
+- Resource constraint: Two senior developers allocated to another initiative.
+
+Issues:
+- Critical defects discovered during UAT
+
+Dependencies:
+- Infrastructure setup

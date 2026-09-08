@@ -1,0 +1,136 @@
+{
+  "folder": "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes",
+  "rules_file": "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\validation-rules.md",
+  "generated_at_utc": "2026-09-08T09:25:34.310950+00:00",
+  "target_files": [
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_01.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_02.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_03.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_04.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_05.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_06.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_07.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_08.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_09.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_10.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_11.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_12.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_13.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_14.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_15.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_16.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_17.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_18.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_19.txt",
+    "C:\\Users\\Ashwini_Pingale\\VSCODE\\workspace\\hello-genai\\work\\module03-task\\meeting-notes\\realistic_meeting_notes_20.txt"
+  ],
+  "results": [
+    {
+      "file": "realistic_meeting_notes_01.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_02.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_03.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_04.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_05.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_06.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_07.txt",
+      "missing_sections": [
+        "Action Items"
+      ],
+      "summary": "Missing sections: Action Items"
+    },
+    {
+      "file": "realistic_meeting_notes_08.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_09.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_10.txt",
+      "missing_sections": [
+        "Issues",
+        "Dependencies"
+      ],
+      "summary": "Missing sections: Issues, Dependencies"
+    },
+    {
+      "file": "realistic_meeting_notes_11.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_12.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_13.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_14.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_15.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_16.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_17.txt",
+      "missing_sections": [
+        "Attendees"
+      ],
+      "summary": "Missing sections: Attendees"
+    },
+    {
+      "file": "realistic_meeting_notes_18.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_19.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    },
+    {
+      "file": "realistic_meeting_notes_20.txt",
+      "missing_sections": [],
+      "summary": "All validation rules passed"
+    }
+  ]
+}
