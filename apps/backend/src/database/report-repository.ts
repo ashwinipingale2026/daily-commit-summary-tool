@@ -217,7 +217,7 @@ export class ReportRepository {
             `INSERT INTO commit_evidence (
               author_summary_id, report_id, commit_hash, short_hash, author_name,
               author_email, author_timestamp, committer_timestamp, subject, body,
-              files_changed, binary, file_count, lines_added, lines_removed
+              files_changed, "binary", file_count, lines_added, lines_removed
             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, $12, $13, $14, $15)`,
             [
               authorId,
@@ -301,7 +301,7 @@ export class ReportRepository {
                   'subject', c.subject,
                   'body', c.body,
                   'filesChanged', c.files_changed,
-                  'binary', c.binary,
+                  'binary', c."binary",
                   'fileCount', c.file_count,
                   'linesAdded', c.lines_added,
                   'linesRemoved', c.lines_removed
@@ -340,7 +340,7 @@ export class ReportRepository {
 
   async findLatestReport(repositoryPath: string, branchName?: string): Promise<PersistedReport | null> {
     return this.findOneReport("r.repository_path = $1 AND ($2::text IS NULL OR r.branch_name = $2)", [
-      repositoryPath,
+      repositoryPath.replaceAll("\\", "/"),
       branchName ?? null,
     ]);
   }

@@ -52,7 +52,7 @@ CREATE TABLE commit_evidence (
   body text,
   files_changed jsonb NOT NULL
     CHECK (jsonb_typeof(files_changed) = 'array'),
-  binary boolean NOT NULL DEFAULT false,
+  "binary" boolean NOT NULL DEFAULT false,
   file_count integer NOT NULL CHECK (file_count >= 0),
   lines_added integer NOT NULL CHECK (lines_added >= 0),
   lines_removed integer NOT NULL CHECK (lines_removed >= 0),
