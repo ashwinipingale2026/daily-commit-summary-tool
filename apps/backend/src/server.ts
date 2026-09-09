@@ -1,10 +1,15 @@
+import { config as loadDotenv } from "dotenv";
 import { Pool } from "pg";
+import { resolve } from "node:path";
 import { createApp } from "./app";
 import { loadConfig } from "./config/environment";
 import { ReportRepository } from "./database/report-repository";
 import { reportProjection } from "./api/projection";
 import { ReportGenerationService } from "./services/reports/report-generation";
 import { MarkdownRenderer } from "./services/reports/markdown-renderer";
+import { GitHubModelsSummary } from "./services/reports/github-models-summary";
+
+loadDotenv({ path: resolve(process.cwd(), "../../.env") });
 
 const config = loadConfig();
 const pool = new Pool({ connectionString: config.databaseUrl });
@@ -15,6 +20,7 @@ const generation = new ReportGenerationService({
   persistence: repository,
   projection: reportProjection,
   markdown,
+  summarize: config.ai ? new GitHubModelsSummary(config.ai) : undefined,
 });
 const app = createApp({ config, repository, generation, markdown });
 const server = app.listen(config.port, () => {
