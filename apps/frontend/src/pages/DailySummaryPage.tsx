@@ -25,6 +25,18 @@ function downloadBlob(blob: Blob, reportId: string): void {
   URL.revokeObjectURL(url);
 }
 
+function dedupeWarnings(warnings: Report["warnings"]): Report["warnings"] {
+  const seen = new Set<string>();
+  return warnings.filter((warning) => {
+    const key = `${warning.code}::${warning.message}`;
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
+}
+
 export function DailySummaryPage() {
   const [report, setReport] = useState<Report | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -108,7 +120,7 @@ export function DailySummaryPage() {
           {report.warnings.length > 0 ? (
             <section className="warning-panel" aria-label="Report warnings" aria-live="polite">
               <strong>Notice</strong>
-              {report.warnings.map((warning, index) => <span key={`${warning.code}-${index}`}>{warning.message}</span>)}
+              {dedupeWarnings(report.warnings).map((warning) => <span key={`${warning.code}-${warning.message}`}>{warning.message}</span>)}
             </section>
           ) : null}
           <Totals totals={report.totals} />

@@ -115,6 +115,20 @@ describe("DailySummaryPage", () => {
     expect(screen.getByText("Update report")).toBeInTheDocument();
   });
 
+  it("deduplicates identical warnings shared across authors in the notice banner", async () => {
+    vi.spyOn(reportApiClient, "getLatestReport").mockResolvedValue(createReport({
+      warnings: [
+        { code: "AI_SUMMARY_FALLBACK", message: "AI summaries are unavailable" },
+        { code: "AI_SUMMARY_FALLBACK", message: "AI summaries are unavailable" },
+      ],
+    }));
+
+    renderPage();
+    await screen.findByRole("region", { name: "Report warnings" });
+
+    expect(screen.getAllByText("AI summaries are unavailable")).toHaveLength(1);
+  });
+
   it("announces recoverable errors and retries the initial load", async () => {
     const error = new ApiClientError("The backend service could not be reached", {
       status: "error",
